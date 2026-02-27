@@ -1,0 +1,10 @@
+{
+  "name": "numfmt-js",
+  "version": "0.1.0",
+  "description": "JavaScript codec for compact approximate numeric encode/decode",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "test": "node --test"
+  }
+}

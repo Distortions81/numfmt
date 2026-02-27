@@ -43,6 +43,42 @@ You can tune:
 go get numfmt
 ```
 
+## JavaScript
+
+A minimal JavaScript codec is available in `js/`.
+
+```bash
+cd js
+npm test
+```
+
+```js
+const { encode, decode, newCodecWithRange } = require("./index");
+
+const code = encode(12345.67);
+const approx = decode(code);
+
+const ranged = newCodecWithRange(16, 3, 1000, 1, 2419200);
+const rangedCode = ranged.encode(30780);
+const rangedApprox = ranged.decode(rangedCode);
+```
+
+## Go + JS HTTP example
+
+A full example is available in `examples/go-js-http/`:
+
+- Go server exposes JSON endpoint with encoded records
+- server writes binary `.nmf` files from the same record stream
+- Node client fetches JSON, decodes values with the JS codec, and downloads binary payloads
+
+```bash
+go run ./examples/go-js-http/server.go
+```
+
+```bash
+node ./examples/go-js-http/client.js
+```
+
 ## Quick start
 
 ```go
