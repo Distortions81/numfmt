@@ -4,6 +4,8 @@
 
 It is useful when raw `float64` is overkill and payload size matters.
 
+Quick guide: https://github.com/Distortions81/numfmt/blob/main/docs/quantization_guide.md
+
 ## Why this is useful
 
 Many systems move huge volumes of numeric telemetry where exact values are not required:
@@ -131,4 +133,3 @@ go test -run TestGenerateQuantizationGuide
 
 This generates `docs/quantization_guide.md` with concrete examples, ranges, encoded values, decoded values, and observed error.
 
-GitHub guide: https://github.com/Distortions81/numfmt/blob/main/docs/quantization_guide.md
