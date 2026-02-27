@@ -17,12 +17,9 @@ Many systems move huge volumes of numeric telemetry where exact values are not r
 
 In those cases, using `8/16/32` bits instead of `64` can cut storage and bandwidth significantly.
 
-Example space for `10000 records x 1m users` for one data point:
-
-- `8-bit`: `~9.31GB` (`~87.5%` smaller than `int64`)
-- `16-bit`: `~18.63GB` (`~75%` smaller)
-- `32-bit`: `~37.25GB` (`~50%` smaller)
-- `int64`: `~74.51GB`
+Real workload example: `1,440 records x 1,000,000 clients`.
+two metrics (`hashrate` + `best share`): `16-bit` `~5.36GB` vs `int64` `~21.46GB` (`~75%` smaller)
+For in-memory and for database... this is a huge help.
 
 ## Core idea
 
@@ -132,4 +129,3 @@ go test -run TestGenerateQuantizationGuide
 ```
 
 This generates `docs/quantization_guide.md` with concrete examples, ranges, encoded values, decoded values, and observed error.
-
