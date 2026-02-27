@@ -323,8 +323,6 @@ func TestGenerateQuantizationGuide(t *testing.T) {
 		{name: "Simplistic-8bit", codec: MustNew(Bits8, autoExp(Bits8, 1_000_000), 1000), sampleMin: 1, sampleMax: 1_000_000, description: "Tiny payloads and rough telemetry."},
 		{name: "Balanced-16bit", codec: MustNew(Bits16, autoExp(Bits16, 1_000_000_000), 1000), sampleMin: 1, sampleMax: 1_000_000_000, description: "Default profile for broad SI ranges."},
 		{name: "Precision-32bit", codec: MustNew(Bits32, autoExp(Bits32, 1_000_000_000_000), 1000), sampleMin: 1, sampleMax: 1_000_000_000_000, description: "Higher detail while still compact."},
-		{name: "Range16-Realistic", codec: MustNewWithRange(Bits16, autoExp(Bits16, 1_000_000), 1000, 1, 1_000_000), sampleMin: 1, sampleMax: 1_000_000, description: "16-bit with realistic operating min/max windows."},
-		{name: "Range32-Realistic", codec: MustNewWithRange(Bits32, autoExp(Bits32, 1_000_000_000_000), 1000, 1, 1_000_000_000_000), sampleMin: 1, sampleMax: 1_000_000_000_000, description: "32-bit with realistic min/max windows and finer precision."},
 	}
 	var b strings.Builder
 	b.WriteString("# Quantization Guide\n\n")
@@ -412,6 +410,15 @@ func TestGenerateQuantizationGuide(t *testing.T) {
 				code = codecForRow.Encode(ex.value)
 				decoded = codecForRow.Decode(code)
 				errPct = 100 * math.Abs(decoded-ex.value) / ex.value
+
+				// If error is high, tighten range to improve 8-bit readability.
+				if errPct > 2.00 {
+					nextMax := tunedMax / 10
+					if nextMax > ex.value*2 && nextMax >= ex.max/100 {
+						tunedMax = nextMax
+						continue
+					}
+				}
 
 				// If error is already tiny, broaden range for a more realistic tradeoff.
 				if errPct < 0.05 {

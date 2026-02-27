@@ -17,13 +17,13 @@ Tiny payloads and rough telemetry.
 
 Application examples:
 
-| example          | min/max | exp | input   | code | decoded | error |
-|------------------|---------|-----|---------|------|---------|-------|
-| requests/min     | 0-100M  | 2   | 1.38k   | 68   | 1.4k    | 1.59% |
-| miles distance   | 0-100k  | 1   | 242.7   | 101  | 240.41  | 0.94% |
-| duration (unix)  | 0s-4w   | 2   | 8h 33m  | 96   | 8h 47m  | 2.74% |
-| pounds           | 0-1k    | 1   | 186.4   | 96   | 182.77  | 1.95% |
-| filesize (bytes) | 0-1P    | 3   | 136.92M | 86   | 125.89M | 8.05% |
+| example          | min/max   | exp | input   | code | decoded | error |
+|------------------|-----------|-----|---------|------|---------|-------|
+| requests/min     | 0-100M    | 2   | 1.38k   | 68   | 1.4k    | 1.59% |
+| miles distance   | 0-100k    | 1   | 242.7   | 101  | 240.41  | 0.94% |
+| duration (unix)  | 0s-2d 19h | 1   | 8h 33m  | 192  | 8h 47m  | 2.74% |
+| pounds           | 0-1k      | 1   | 186.4   | 96   | 182.77  | 1.95% |
+| filesize (bytes) | 0-10T     | 3   | 136.92M | 86   | 125.89M | 8.05% |
 
 ## Balanced-16bit
 
@@ -56,36 +56,4 @@ Application examples:
 | duration (unix)  | 0s-40w  | 2   | 8h 33m  | 1606413910 | 8h 33m  |
 | pounds           | 0-10k   | 1   | 186.4   | 1625248487 | 186.4   |
 | filesize (bytes) | 0-10P   | 3   | 136.92M | 1456077466 | 136.92M |
-
-## Range16-Realistic
-
-16-bit with realistic operating min/max windows.
-
-- space 10m values: `19.07MB` int64: `76.29MB` (75.00% smaller)
-
-Application examples:
-
-| example          | min/max | exp | input   | code  | decoded | error |
-|------------------|---------|-----|---------|-------|---------|-------|
-| requests/min     | 0-100M  | 2   | 1.38k   | 30134 | 1.37k   | 0.01% |
-| miles distance   | 0-1M    | 2   | 242.7   | 39213 | 242.72  | 0.01% |
-| duration (unix)  | 0s-40w  | 2   | 8h 33m  | 44452 | 8h 33m  |       |
-| pounds           | 0-10k   | 1   | 186.4   | 52941 | 186.39  |       |
-| filesize (bytes) | 0-1T    | 3   | 136.92M | 37402 | 136.9M  | 0.01% |
-
-## Range32-Realistic
-
-32-bit with realistic min/max windows and finer precision.
-
-- space 10m values: `38.15MB` int64: `76.29MB` (50.00% smaller)
-
-Application examples:
-
-| example          | min/max | exp | input   | code       | decoded |
-|------------------|---------|-----|---------|------------|---------|
-| requests/min     | 0-1B    | 2   | 1.38k   | 1497656384 | 1.37k   |
-| miles distance   | 0-1M    | 2   | 242.7   | 2569855397 | 242.7   |
-| duration (unix)  | 0s-40w  | 2   | 8h 33m  | 2913227087 | 8h 33m  |
-| pounds           | 0-10k   | 1   | 186.4   | 3469591933 | 186.4   |
-| filesize (bytes) | 0-10P   | 3   | 136.92M | 542343126  | 136.92M |
 
