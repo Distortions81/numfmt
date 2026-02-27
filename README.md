@@ -19,7 +19,10 @@ In those cases, using `8/16/32` bits instead of `64` can cut storage and bandwid
 
 Real workload example: `1,440 records x 1,000,000 clients`.
 - two metrics (`hashrate` + `best share`): `16-bit` `~5.36GB` vs `int64` `~21.46GB` (`~75%` smaller)
-- For in-memory and for database... this is a huge help.
+- For in-memory, json endpoint and database I/O... this is a huge help.
+
+Over-the-wire JSON example (minified, uncompressed) for `2` entries x `1,440` records:
+- payload reduction: if codes are packed as `uint16` bytes and sent as base64 in JSON, this is often still much smaller than raw large JSON numbers (for `0..100T`, commonly around `70-85%` smaller)
 
 ## Core idea
 
