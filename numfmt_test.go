@@ -337,12 +337,12 @@ func TestGenerateQuantizationGuide(t *testing.T) {
 
 		b.WriteString(fmt.Sprintf("## %s\n\n", p.name))
 		b.WriteString(fmt.Sprintf("%s\n\n", p.description))
-		const sampleValues = 10_000_000
+		const sampleValues = 100_000_000
 		bytes64 := float64(sampleValues * 8)
 		bytesFmt := float64(sampleValues) * float64(p.codec.TotalBits) / 8
 		savedBytes := bytes64 - bytesFmt
 		savedPct := 100 * savedBytes / bytes64
-		b.WriteString(fmt.Sprintf("- space 10m values: `%s` int64: `%s` (%.2f%% smaller)\n\n", humanBytes(bytesFmt), humanBytes(bytes64), savedPct))
+		b.WriteString(fmt.Sprintf("- space 100m values: `%s` int64: `%s` (%.2f%% smaller)\n\n", humanBytes(bytesFmt), humanBytes(bytes64), savedPct))
 
 		b.WriteString("Application examples:\n\n")
 		type example struct {
@@ -359,7 +359,7 @@ func TestGenerateQuantizationGuide(t *testing.T) {
 			{label: "miles distance", value: 242.7, min: 0, max: 100_000, cap: 1_000_000},
 			{label: "duration (unix)", value: durationSeconds, min: 0, max: 2_419_200, cap: 31_536_000}, // 0 to 4 weeks
 			{label: "pounds", value: 186.4, min: 0, max: 1_000, cap: 10_000},
-			{label: "filesize (bytes)", value: 136_920_000, min: 0, max: 1_000_000_000_000_000, cap: 10_000_000_000_000_000},
+			{label: "filesize (bytes)", value: 136_920_000, min: 0, max: 1_000_000_000_000_000, cap: 100_000_000_000_000_000},
 		}
 		if p.codec.RangeEnabled() && strings.Contains(p.name, "Range16") {
 			examples = []example{
@@ -367,7 +367,7 @@ func TestGenerateQuantizationGuide(t *testing.T) {
 				{label: "miles distance", value: 242.7, min: 0, max: 100_000, cap: 1_000_000},
 				{label: "duration (unix)", value: durationSeconds, min: 0, max: 2_419_200, cap: 31_536_000},
 				{label: "pounds", value: 186.4, min: 0, max: 1_000, cap: 10_000},
-				{label: "filesize (bytes)", value: 136_920_000, min: 0, max: 10_000_000_000, cap: 1_000_000_000_000},
+				{label: "filesize (bytes)", value: 136_920_000, min: 0, max: 100_000_000_000, cap: 1_000_000_000_000},
 			}
 		}
 

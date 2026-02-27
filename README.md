@@ -1,22 +1,39 @@
 # numfmt
 
-Reusable Go library for compact SI-style quantization of wide-range positive values.
+`numfmt` is a small Go library for compressing large positive numbers into compact integer codes with predictable error.
 
-## Supported bit widths
+It is useful when raw `float64` is overkill and payload size matters.
 
-- `8`, `16`, `32` total bits
-- Configurable split between exponent and mantissa areas
-- Configurable radix base (default examples use `1000`)
-- Optional range-constrained mode (`min` + `max`) to reduce quantization in known operating windows
+## Why this is useful
 
-## Default format
+Many systems move huge volumes of numeric telemetry where exact values are not required:
 
-`DefaultCodec` matches the original behavior:
+- metrics streams (`requests/min`, latency buckets, counters)
+- map and tracking data (distance, pace, durations)
+- device or sensor pipelines (weights, rates, environmental readings)
+- storage-heavy event logs and snapshots
 
-- `16` total bits
-- `3` exponent bits
-- `13` mantissa bits
-- `base = 1000`
+In those cases, using `8/16/32` bits instead of `64` can cut storage and bandwidth significantly.
+
+Example space for `100m` values:
+
+- `8-bit`: `~95.37MB` (`~87.5%` smaller than `int64`)
+- `16-bit`: `~190.73MB` (`~75%` smaller)
+- `32-bit`: `~381.47MB` (`~50%` smaller)
+- `int64`: `~762.94MB`
+
+## Core idea
+
+A value is encoded into:
+
+- exponent bucket (coarse scale)
+- mantissa step (detail inside that scale)
+
+You can tune:
+
+- total bits: `8`, `16`, `32`
+- exponent bits (or auto-pick from max expected value)
+- optional `min/max` range for tighter quantization in known domains
 
 ## Install
 
@@ -24,7 +41,7 @@ Reusable Go library for compact SI-style quantization of wide-range positive val
 go get numfmt
 ```
 
-## Usage (default 16-bit codec)
+## Quick start
 
 ```go
 package main
@@ -41,20 +58,31 @@ func main() {
 }
 ```
 
-## Custom codec (variable exponent/mantissa)
+## Real-world style examples
 
 ```go
-codec, err := numfmt.New(numfmt.Bits32, 6, 1000) // 6 exponent bits, 26 mantissa bits
-if err != nil {
-	panic(err)
-}
+// requests/min in a service dashboard
+reqCodec := numfmt.MustNew(numfmt.Bits16, 2, 1000)
+reqCode := reqCodec.Encode(1375)
+reqApprox := reqCodec.Decode(reqCode)
 
-code := codec.Encode32(42_000_000)
-value := codec.Decode32(code)
-_ = value
+// duration in seconds (for spans up to ~4 weeks)
+durCodec := numfmt.MustNewWithRange(numfmt.Bits16, 2, 1000, 1, 2_419_200)
+durCode := durCodec.Encode(30_780) // ~8h 33m
+
+durApprox := durCodec.Decode(durCode)
+
+// filesize in bytes (range-constrained to your domain)
+sizeCodec := numfmt.MustNewWithRange(numfmt.Bits16, 3, 1000, 1, 1_000_000_000_000)
+sizeCode := sizeCodec.Encode(136_920_000)
+sizeApprox := sizeCodec.Decode(sizeCode)
+
+_, _, _ = reqApprox, durApprox, sizeApprox
 ```
 
-## Auto exponent sizing (from max input)
+## Auto exponent sizing
+
+If you know the max value you care about, you can pick exponent bits automatically:
 
 ```go
 expBits, err := numfmt.RecommendedExpBits(numfmt.Bits16, 1000, 100_000_000)
@@ -63,9 +91,20 @@ if err != nil {
 }
 
 codec := numfmt.MustNew(numfmt.Bits16, expBits, 1000)
+_ = codec
 ```
 
-## Binary payload helper (header + packed values)
+## Binary payload helper
+
+You can store a whole numeric slice in a compact binary blob with a self-describing header.
+
+Header includes:
+
+- total bits
+- exponent bits
+- base
+- range min/max (if enabled)
+- value count
 
 ```go
 codec := numfmt.MustNewWithRange(numfmt.Bits16, 2, 1000, 1, 2_419_200)
@@ -81,41 +120,13 @@ if err != nil {
 	panic(err)
 }
 
-_ = restoredCodec
-_ = restoredValues
+_, _ = restoredCodec, restoredValues
 ```
 
-Header contains total bits, exponent bits, base, range min/max, and value count.
-
-## Range-constrained codec (lower quantization in a known domain)
-
-```go
-codec, err := numfmt.NewWithRange(numfmt.Bits16, 3, 1000, 10_000, 200_000)
-if err != nil {
-	panic(err)
-}
-
-// Values inside [10_000, 200_000] get finer effective precision
-// because all non-zero codes are allocated to this range.
-code := codec.Encode16(42_000)
-value := codec.Decode16(code)
-_ = value
-```
-
-## Generic encode/decode
-
-```go
-codec := numfmt.MustNew(numfmt.Bits32, 6, 1000)
-code := codec.Encode(123_456_789) // uint64
-value := codec.Decode(code)
-_ = value
-```
-
-## Generate a quantization guide file
+## Generate the quantization guide
 
 ```bash
 go test -run TestGenerateQuantizationGuide
 ```
 
-This writes `docs/quantization_guide.md` with profiles from simplistic to options-galore,
-including exponent explanation, mantissa detail levels, and sampled quantization error.
+This generates `docs/quantization_guide.md` with concrete examples, ranges, encoded values, decoded values, and observed error.
