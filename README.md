@@ -18,8 +18,8 @@ Many systems move huge volumes of numeric telemetry where exact values are not r
 In those cases, using `8/16/32` bits instead of `64` can cut storage and bandwidth significantly.
 
 Real workload example: `1,440 records x 1,000,000 clients`.
-two metrics (`hashrate` + `best share`): `16-bit` `~5.36GB` vs `int64` `~21.46GB` (`~75%` smaller)
-For in-memory and for database... this is a huge help.
+- two metrics (`hashrate` + `best share`): `16-bit` `~5.36GB` vs `int64` `~21.46GB` (`~75%` smaller)
+- For in-memory and for database... this is a huge help.
 
 ## Core idea
 
