@@ -15,7 +15,7 @@ Many systems move huge volumes of numeric telemetry where exact values are not r
 
 In those cases, using `8/16/32` bits instead of `64` can cut storage and bandwidth significantly.
 
-Example space for `10000 records x 1m users`:
+Example space for `10000 records x 1m users` for one data point:
 
 - `8-bit`: `~9.31GB` (`~87.5%` smaller than `int64`)
 - `16-bit`: `~18.63GB` (`~75%` smaller)
@@ -130,3 +130,5 @@ go test -run TestGenerateQuantizationGuide
 ```
 
 This generates `docs/quantization_guide.md` with concrete examples, ranges, encoded values, decoded values, and observed error.
+
+GitHub guide: https://github.com/Distortions81/numfmt/blob/main/docs/quantization_guide.md
