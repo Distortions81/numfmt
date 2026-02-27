@@ -15,12 +15,12 @@ Many systems move huge volumes of numeric telemetry where exact values are not r
 
 In those cases, using `8/16/32` bits instead of `64` can cut storage and bandwidth significantly.
 
-Example space for `100m` values:
+Example space for `10000 records x 1m users`:
 
-- `8-bit`: `~95.37MB` (`~87.5%` smaller than `int64`)
-- `16-bit`: `~190.73MB` (`~75%` smaller)
-- `32-bit`: `~381.47MB` (`~50%` smaller)
-- `int64`: `~762.94MB`
+- `8-bit`: `~9.31GB` (`~87.5%` smaller than `int64`)
+- `16-bit`: `~18.63GB` (`~75%` smaller)
+- `32-bit`: `~37.25GB` (`~50%` smaller)
+- `int64`: `~74.51GB`
 
 ## Core idea
 

@@ -337,12 +337,12 @@ func TestGenerateQuantizationGuide(t *testing.T) {
 
 		b.WriteString(fmt.Sprintf("## %s\n\n", p.name))
 		b.WriteString(fmt.Sprintf("%s\n\n", p.description))
-		const sampleValues = 100_000_000
+		const sampleValues = 10_000_000_000
 		bytes64 := float64(sampleValues * 8)
 		bytesFmt := float64(sampleValues) * float64(p.codec.TotalBits) / 8
 		savedBytes := bytes64 - bytesFmt
 		savedPct := 100 * savedBytes / bytes64
-		b.WriteString(fmt.Sprintf("- space 100m values: `%s` int64: `%s` (%.2f%% smaller)\n\n", humanBytes(bytesFmt), humanBytes(bytes64), savedPct))
+		b.WriteString(fmt.Sprintf("- space 10000 records x 1m users: `%s` int64: `%s` (%.2f%% smaller)\n\n", humanBytes(bytesFmt), humanBytes(bytes64), savedPct))
 
 		b.WriteString("Application examples:\n\n")
 		type example struct {
