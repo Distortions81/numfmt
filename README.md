@@ -4,7 +4,7 @@
 
 It is useful when raw `float64` is overkill and payload size matters.
 
-Quick guide: https://github.com/Distortions81/numfmt/blob/main/docs/quantization_guide.md
+Quick guide: https://github.com/Distortions81/numfmt/blob/Main/docs/quantization_guide.md
 
 ## Why this is useful
 
