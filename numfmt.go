@@ -48,6 +48,37 @@ func New(totalBits, expBits uint8, base float64) (Codec, error) {
 	return Codec{TotalBits: totalBits, ExpBits: expBits, Base: base}, nil
 }
 
+// RecommendedExpBits returns an exponent-bit count sized for maxValue in SI mode.
+//
+// The returned value is in [1,totalBits-1]. If maxValue is too large to represent
+// without saturation for the given totalBits, this returns totalBits-1.
+func RecommendedExpBits(totalBits uint8, base, maxValue float64) (uint8, error) {
+	if !isValidTotalBits(totalBits) {
+		return 0, fmt.Errorf("totalBits must be one of [8,16,32], got %d", totalBits)
+	}
+	if !(base > 1) || math.IsNaN(base) || math.IsInf(base, 0) {
+		return 0, fmt.Errorf("base must be finite and > 1, got %v", base)
+	}
+	if !(maxValue > 0) || math.IsNaN(maxValue) || math.IsInf(maxValue, 0) {
+		return 0, fmt.Errorf("maxValue must be finite and > 0, got %v", maxValue)
+	}
+
+	// Need maxExp >= floor(log_base(maxValue)) to avoid saturation in SI mode.
+	requiredMaxExp := uint64(0)
+	if maxValue >= 1 {
+		requiredMaxExp = uint64(math.Floor(math.Log(maxValue)/math.Log(base) + 1e-12))
+	}
+
+	b := uint8(1)
+	for b < totalBits && ((uint64(1)<<b)-1) < requiredMaxExp {
+		b++
+	}
+	if b >= totalBits {
+		return totalBits - 1, nil
+	}
+	return b, nil
+}
+
 // NewWithRange returns a codec that prioritizes precision within [minValue, maxValue].
 func NewWithRange(totalBits, expBits uint8, base, minValue, maxValue float64) (Codec, error) {
 	c, err := New(totalBits, expBits, base)

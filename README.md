@@ -54,6 +54,39 @@ value := codec.Decode32(code)
 _ = value
 ```
 
+## Auto exponent sizing (from max input)
+
+```go
+expBits, err := numfmt.RecommendedExpBits(numfmt.Bits16, 1000, 100_000_000)
+if err != nil {
+	panic(err)
+}
+
+codec := numfmt.MustNew(numfmt.Bits16, expBits, 1000)
+```
+
+## Binary payload helper (header + packed values)
+
+```go
+codec := numfmt.MustNewWithRange(numfmt.Bits16, 2, 1000, 1, 2_419_200)
+values := []float64{60, 3600, 30_780}
+
+blob, err := numfmt.EncodeValuesBinary(codec, values)
+if err != nil {
+	panic(err)
+}
+
+restoredCodec, restoredValues, err := numfmt.DecodeValuesBinary(blob)
+if err != nil {
+	panic(err)
+}
+
+_ = restoredCodec
+_ = restoredValues
+```
+
+Header contains total bits, exponent bits, base, range min/max, and value count.
+
 ## Range-constrained codec (lower quantization in a known domain)
 
 ```go
