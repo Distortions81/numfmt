@@ -63,22 +63,6 @@ const rangedCode = ranged.encode(30780);
 const rangedApprox = ranged.decode(rangedCode);
 ```
 
-## Go + JS HTTP example
-
-A full example is available in `examples/go-js-http/`:
-
-- Go server exposes JSON endpoint with encoded records
-- server writes binary `.nmf` files from the same record stream
-- Node client fetches JSON, decodes values with the JS codec, and downloads binary payloads
-
-```bash
-go run ./examples/go-js-http/server.go
-```
-
-```bash
-node ./examples/go-js-http/client.js
-```
-
 ## Quick start
 
 ```go
